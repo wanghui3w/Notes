@@ -70,15 +70,16 @@ D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]>
 ```
 ### 小结
 
-现在总结一下今天学的两点内容：
+> 现在总结一下今天学的两点内容：
 
-1 初始化一个Git仓库，使用git init命令。
+> 1 初始化一个Git仓库，使用git init命令。
 
-2 添加文件到Git仓库，分两步：
+> 2 添加文件到Git仓库，分两步：
 
-* 第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
+> * 第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
 
-* 第二步，使用命令git commit，完成。
+> * 第二步，使用命令git commit，完成。
+
 ***
 # 时光穿梭机
 之前田间了git.md文件，运行`git status`
@@ -104,5 +105,13 @@ D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
 
 * `git status`确认仓库状态
 * `git diff git.md`对比修改前后
+
+### 小结
+
+> 要随时掌握工作区的状态，使用git status命令。
+
+> 如果`git status`告诉你有文件被修改过，用`git diff`可以查看修改内容。
+
+***
 
 ![Alt text](./img/md.jspg "Optional title")
