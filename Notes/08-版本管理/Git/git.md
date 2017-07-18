@@ -1,5 +1,10 @@
 # Git 教程
 https://www.liaoxuefeng.com/
+
+markdown 语法：
+
+http://www.appinn.com/markdown/
+***
 ## Git安装
 ### Linux下安装
 
@@ -51,6 +56,53 @@ $ ls -ah
 如果你没有看到`.git`目录，那是因为这个目录默认是隐藏的，用`ls -ah`命令就可以看见。
 
 ### 把文件添加到版本库
+第一步，用命令git add告诉Git，把文件添加到仓库：
 
+`D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +1 ~0 -0 !]> git add .\git.md`
+
+第二步，用命令git commit告诉Git，把文件提交到仓库：
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +1 ~0 -0 | +3 ~0 -0 !]> git commit -m "git file git.md"
+[master (root-commit) d1ee4a3] git file git.md
+ 1 file changed, 56 insertions(+)
+ create mode 100644 "Notes/08-\347\211\210\346\234\254\347\256\241\347\220\206/Git/git.md"
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]>
+```
+### 小结
+
+现在总结一下今天学的两点内容：
+
+1 初始化一个Git仓库，使用git init命令。
+
+2 添加文件到Git仓库，分两步：
+
+* 第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
+
+* 第二步，使用命令git commit，完成。
+***
+# 时光穿梭机
+之前田间了git.md文件，运行`git status`
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]> git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   git.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        img/
+        "../../30-\346\226\207\346\234\254\347\274\226\350\276\221/"
+        "../../\350\277\220\347\273\264\345\267\245\345\205\267\344\275\223\347\263\273.md"
+
+no changes added to commit (use "git add" and/or "git commit -a")
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
+```
+
+* `git status`确认仓库状态
+* `git diff git.md`对比修改前后
 
 ![Alt text](./img/md.jspg "Optional title")
