@@ -1,7 +1,5 @@
 # Git 教程
 https://www.liaoxuefeng.com/
-<<<<<<< HEAD
-=======
 
 markdown 语法：
 
@@ -371,4 +369,48 @@ $ git branch
 * dev
   master
 ```
--master--------
+
+然后提交：
+```
+$ git add readme.txt
+$ git commit -m "branch test"
+[dev fec145a] branch test
+ 1 file changed, 1 insertion(+)
+```
+现在，dev分支的工作完成，我们就可以切换回master分支：
+```
+$ git checkout master
+Switched to branch 'master'
+```
+把dev分支的工作成果合并到master分支上：
+```
+$ git merge dev
+Updating d17efd8..fec145a
+Fast-forward
+ readme.txt |    1 +
+ 1 file changed, 1 insertion(+)
+```
+合并完成后，就可以放心地删除dev分支了：
+```
+$ git branch -d dev
+Deleted branch dev (was fec145a).
+```
+
+### 小结
+
+Git鼓励大量使用分支：
+
+查看分支：`git branch`
+
+创建分支：`git branch <name>`
+
+切换分支：`git checkout <name>`
+
+创建+切换分支：`git checkout -b <name>`
+
+合并某分支到当前分支：`git merge <name>`
+
+删除分支：`git branch -d <name>`
+
+## 解决冲突
+mergmergmerg
