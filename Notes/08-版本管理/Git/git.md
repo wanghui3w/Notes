@@ -265,13 +265,18 @@ D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
 
 注册GitHub账号。由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以，需要一点设置：
 
-### 第1步：创建SSH Key
+#### 第1步：创建SSH Key
 
 ```
 $ ssh-keygen -t rsa -C "wanghui3w@139.com"
 ```
-### 第2步：登陆GitHub
+#### 第2步：登陆GitHub
 
 打开“Account settings”，“SSH Keys”页面，然后点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容。
+
+git出现问题，参考了：
+
+http://blog.csdn.net/laner415/article/details/52966890
+
 
 ![Alt text](./img/md.jspg "Optional title")
