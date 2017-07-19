@@ -1,5 +1,13 @@
 # Git 教程
 https://www.liaoxuefeng.com/
+<<<<<<< HEAD
+=======
+
+markdown 语法：
+
+http://www.appinn.com/markdown/
+***
+>>>>>>> 298cc684e99e03c219c88624f51ba43dca82514f
 ## Git安装
 ### Linux下安装
 
@@ -51,8 +59,254 @@ $ ls -ah
 如果你没有看到`.git`目录，那是因为这个目录默认是隐藏的，用`ls -ah`命令就可以看见。
 
 ### 把文件添加到版本库
+<<<<<<< HEAD
 
 
 ![Alt text](./img/md.jspg "Optional title")
 
 test
+=======
+第一步，用命令git add告诉Git，把文件添加到仓库：
+
+`D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +1 ~0 -0 !]> git add .\git.md`
+
+第二步，用命令git commit告诉Git，把文件提交到仓库：
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +1 ~0 -0 | +3 ~0 -0 !]> git commit -m "git file git.md"
+[master (root-commit) d1ee4a3] git file git.md
+ 1 file changed, 56 insertions(+)
+ create mode 100644 "Notes/08-\347\211\210\346\234\254\347\256\241\347\220\206/Git/git.md"
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]>
+```
+### 小结
+
+> 现在总结一下今天学的两点内容：
+
+> 1 初始化一个Git仓库，使用git init命令。
+
+> 2 添加文件到Git仓库，分两步：
+
+> * 第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
+
+> * 第二步，使用命令git commit，完成。
+
+***
+## 时光穿梭机
+之前田间了git.md文件，运行`git status`
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]> git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   git.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        img/
+        "../../30-\346\226\207\346\234\254\347\274\226\350\276\221/"
+        "../../\350\277\220\347\273\264\345\267\245\345\205\267\344\275\223\347\263\273.md"
+
+no changes added to commit (use "git add" and/or "git commit -a")
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
+```
+
+* `git status`确认仓库状态
+* `git diff git.md`对比修改前后
+
+### 小结
+
+> 要随时掌握工作区的状态，使用git status命令。
+
+> 如果`git status`告诉你有文件被修改过，用`git diff`可以查看修改内容。
+
+
+## 版本回退
+
+`git log`令显示从最近到最远的提交日志，如果嫌输出信息太多，看得眼花缭乱的，可以试试加上--pretty=oneline参数：
+
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]> git log
+commit 7ba4071416ba21e4d7e3fd578278bcf07ed0c280
+Author: wanghui <wanghui3w@139.com>
+Date:   Tue Jul 18 11:03:24 2017 +0800
+
+    4
+
+commit 4ce15acc90b56f162328288bc348f31d6a0f672e
+Author: wanghui <wanghui3w@139.com>
+Date:   Tue Jul 18 10:47:34 2017 +0800
+
+    第三次
+
+commit cf3fa8e4f566225e1c804daae94d4d68dc438d1b
+Author: wanghui <wanghui3w@139.com>
+Date:   Tue Jul 18 10:41:03 2017 +0800
+
+    第二次commit
+
+commit 01c42de30c64591323d07092db35a13496be17d2
+Author: wanghui <wanghui3w@139.com>
+Date:   Tue Jul 18 10:39:00 2017 +0800
+
+    git test file get-test.txt
+
+commit d1ee4a38ee3a3d785e2ff1c803d9fc9303a2e7a8
+Author: wanghui <wanghui3w@139.com>
+Date:   Tue Jul 18 10:14:57 2017 +0800
+
+    git file git.md
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]>
+```
+
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]> git log --pretty=oneline
+7ba4071416ba21e4d7e3fd578278bcf07ed0c280 4
+4ce15acc90b56f162328288bc348f31d6a0f672e 第三次
+cf3fa8e4f566225e1c804daae94d4d68dc438d1b 第二次commit
+01c42de30c64591323d07092db35a13496be17d2 git test file get-test.txt
+d1ee4a38ee3a3d785e2ff1c803d9fc9303a2e7a8 git file git.md
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
+```
+
+
+首先，Git必须知道当前版本是哪个版本，在Git中，用HEAD表示当前版本，也就是最新的提交7ba4071416ba21e4d7e3fd578278bcf07ed0c280（注意提交ID每个人不一样），上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。现在，我们要把当前版回退到上一个版本，就可以使用`git reset`命令：
+
+```
+$ git reset --hard HEAD^
+```
+
+只要上面的命令行窗口还没有被关掉，你就可以顺着往上找啊找啊，找到那个append GPL的commit id是3628164...，于是就可以指定回到未来的某个版本：
+
+```
+git reset --hard 3628164
+```
+Git的版本回退速度非常快，因为Git在内部有个指向当前版本的HEAD指针，当你回退版本的时候，Git仅仅是把HEAD从指向上个版本标签，然后顺便把工作区的文件更新了。所以你让HEAD指向哪个版本号，你就把当前版本定位在哪。
+
+Git提供了一个命令`git reflog`用来记录你的每一次命令：
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]> git reflog
+7ba4071 HEAD@{0}: commit: 4
+4ce15ac HEAD@{1}: commit: 第三次
+cf3fa8e HEAD@{2}: commit: 第二次commit
+01c42de HEAD@{3}: commit: git test file get-test.txt
+d1ee4a3 HEAD@{4}: commit (initial): git file git.md
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
+```
+
+### 小结
+
+现在总结一下：
+
+> HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id。
+
+> * 穿梭前，用git log可以查看提交历史，以便确定要回退到哪个版本。
+
+> * 要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+
+
+## 工作区和暂存区
+
+**工作区（Working Directory）：** 就是你在电脑里能看到的目录。
+
+**暂存区（Stage）：** 通过`git add` 后的文件，暂时放在暂存区
+
+**版本库（Repository）：** 工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。
+
+前面讲了我们把文件往Git版本库里添加的时候，是分两步执行的：
+
+第一步是用`git add`把文件添加进去，实际上就是把文件修改添加到暂存区；
+
+第二步是用`git commit`提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+
+`git add`命令实际上就是把要提交的所有修改放到暂存区（Stage），然后，执行`git commit`就可以一次性把暂存区的所有修改提交到分支。一旦提交后，如果你又没有对工作区做任何修改，那么工作区就是“干净”的，暂存区是空的。
+
+### 小结
+
+> 暂存区是Git非常重要的概念，弄明白了暂存区，就弄明白了Git的很多操作到底干了什么。
+
+## 管理修改
+### 小结
+
+> 现在，你又理解了Git是如何跟踪修改的，每次修改，如果不add到暂存区，那就不会加入到commit中。
+
+## 撤销修改
+
+**回到上一个修改：** `git reset HEAD readme.txt`
+
+**清空缓存区：** `git checkout -- readme.txt`（注意两个减号）,可以丢弃工作区的修改。
+
+命令`git checkout -- readme.txt`意思就是，把readme.txt文件在工作区的修改全部撤销，这里有两种情况：
+
+* 一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+
+* 一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+
+总之，就是让这个文件回到最近一次git commit或git add时的状态。
+
+### 小结
+
+> * 场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout -- file`。
+
+> * 场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD file`，就回到了场景1，第二步按场景1操作。
+
+> * 场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。
+
+## 删除文件
+
+### 第一种：
+
+1. 操作系统下直接删除`rm test.txt`，如果需要找回`git checkout -- test.txt`
+2. `git rm test.txt`
+3. `git commit -m "delete test"`
+
+### 第二种
+1. `git rm test.txt`
+2. `git commit -m "delete test"`
+
+### 小结
+> `git checkout`其实是用版本库里的版本替换工作区的版本，无论工作区是修改还是删除，都可以“一键还原”。命令`git rm`用于删除一个文件。如果一个文件已经被提交到版本库，那么你永远不用担心误删，但是要小心，你只能恢复文件到最新版本，你会丢失最近一次提交后你修改的内容。
+
+***
+
+## 远程仓库
+
+注册GitHub账号。由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以，需要一点设置：
+
+#### 第1步：创建SSH Key
+
+```
+$ ssh-keygen -t rsa -C "wanghui3w@139.com"
+```
+#### 第2步：登陆GitHub
+
+打开“Account settings”，“SSH Keys”页面，然后点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容。
+
+git出现问题，参考了：
+
+http://blog.csdn.net/laner415/article/details/52966890
+
+https://my.oschina.net/uniquejava/blog/165140
+
+```
+问题（Non-fast-forward）的出现原因在于：git仓库中已经有一部分代码，所以它不允许你直接把你的代码覆盖上去。于是你有2个选择方式：
+
+1，强推，即利用强覆盖方式用你本地的代码替代git仓库内的内容
+
+git push -f
+
+2，先把git的东西fetch到你本地然后merge后再push
+
+$ git fetch
+
+$ git merge
+
+这2句命令等价于
+
+$ git pull
+```
+
+![Alt text](./img/md.jspg "Optional title")
+>>>>>>> 298cc684e99e03c219c88624f51ba43dca82514f
