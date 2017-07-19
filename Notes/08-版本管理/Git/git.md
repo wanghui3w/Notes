@@ -413,4 +413,26 @@ Git鼓励大量使用分支：
 删除分支：`git branch -d <name>`
 
 ## 解决冲突
-mergmergmerg
+准备新的feature1分支，继续我们的新分支开发，在feature1分支上修改并提交，切换到master分支修改并提交，这种情况下，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突：
+```
+$ git merge feature1
+Auto-merging readme.txt
+CONFLICT (content): Merge conflict in readme.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
+Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容，我们修改如下后保存再提交：
+```
+$ git add readme.txt
+$ git commit -m "conflict fixed"
+[master 59bc1cb] conflict fixed
+```
+用带参数的git log也可以看到分支的合并情况：
+```
+$ git log --graph --pretty=oneline --abbrev-commit
+*   59bc1cb conflict fixed
+|\
+| * 75a857c AND simple
+* | 400b400 & simple
+|/
+* fec145a branch test
+```
