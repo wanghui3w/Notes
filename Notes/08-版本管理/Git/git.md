@@ -442,4 +442,102 @@ $ git log --graph --pretty=oneline --abbrev-commit
 通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
 
 如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+在实际开发中，我们应该按照几个基本原则进行分支管理：
+
+首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+
+那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；
+
+你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了。
+
+所以，团队合作的分支看起来就像这样：
 ![branch](./img/branch.png)
+
+### Bug分支
+
+当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支issue-101来修复它，但是，等等，当前正在dev上进行的工作还没有提交,并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？
+
+幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+```
+$ git stash
+Saved working directory and index state WIP on dev: 6224937 add merge
+HEAD is now at 6224937 add merge
+```
+
+#### 小结
+
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+当手头工作没有完成时，先把工作现场`git stash`一下，然后去修复bug，修复后，再`git stash pop`，回到工作现场。
+
+### Feature分支
+#### 小结
+
+开发一个新feature，最好新建一个分支；
+
+如果要丢弃一个没有被合并过的分支，可以通过`git branch -D <name>`强行删除。
+
+### 多人协作
+当你从远程仓库克隆时，实际上Git自动把本地的master分支和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。
+
+要查看远程库的信息，用git remote：
+```
+$ git remote
+origin
+```
+或者，用git remote -v显示更详细的信息：
+```
+$ git remote -v
+origin  git@github.com:michaelliao/learngit.git (fetch)
+origin  git@github.com:michaelliao/learngit.git (push)
+```
+上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。
+
+#### 推送分支
+
+推送分支，就是把该分支上的所有本地提交推送到远程库。推送时，要指定本地分支，这样，Git就会把该分支推送到远程库对应的远程分支上：
+
+`$ git push origin master`
+
+如果要推送其他分支，比如dev，就改成：
+
+`$ git push origin dev`
+但是，并不是一定要把本地分支往远程推送，那么，哪些分支需要推送，哪些不需要呢？
+
+`master`分支是主分支，因此要时刻与远程同步；
+
+`dev`分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
+
+`bug`分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
+
+`feature`分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+
+总之，就是在Git中，分支完全可以在本地自己藏着玩，是否推送，视你的心情而定！
+
+因此，多人协作的工作模式通常是这样：
+
+首先，可以试图用`git push origin branch-name`推送自己的修改；
+
+如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+
+如果合并有冲突，则解决冲突，并在本地提交；
+
+没有冲突或者解决掉冲突后，再用`git push origin branch-name`推送就能成功！
+
+如果`git pull`提示“no tracking information”，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream branch-name origin/branch-name`。
+
+这就是多人协作的工作模式，一旦熟悉了，就非常简单。
+
+#### 小结
+
+查看远程库信息，使用`git remote -v`；
+
+本地新建的分支如果不推送到远程，对其他人就是不可见的；
+
+从本地推送分支，使用`git push origin branch-name`，如果推送失败，先用`git pull`抓取远程的新提交；
+
+在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`，本地和远程分支的名称最好一致；
+
+建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
+
+从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
