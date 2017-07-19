@@ -278,5 +278,24 @@ git出现问题，参考了：
 
 http://blog.csdn.net/laner415/article/details/52966890
 
+https://my.oschina.net/uniquejava/blog/165140
+
+```
+问题（Non-fast-forward）的出现原因在于：git仓库中已经有一部分代码，所以它不允许你直接把你的代码覆盖上去。于是你有2个选择方式：
+
+1，强推，即利用强覆盖方式用你本地的代码替代git仓库内的内容
+
+git push -f
+
+2，先把git的东西fetch到你本地然后merge后再push
+
+$ git fetch
+
+$ git merge
+
+这2句命令等价于
+
+$ git pull
+```
 
 ![Alt text](./img/md.jspg "Optional title")
