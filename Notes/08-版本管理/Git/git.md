@@ -396,7 +396,7 @@ $ git branch -d dev
 Deleted branch dev (was fec145a).
 ```
 
-### 小结
+#### 小结
 
 Git鼓励大量使用分支：
 
@@ -412,7 +412,7 @@ Git鼓励大量使用分支：
 
 删除分支：`git branch -d <name>`
 
-## 解决冲突
+### 解决冲突
 准备新的feature1分支，继续我们的新分支开发，在feature1分支上修改并提交，切换到master分支修改并提交，这种情况下，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突：
 ```
 $ git merge feature1
@@ -436,3 +436,10 @@ $ git log --graph --pretty=oneline --abbrev-commit
 |/
 * fec145a branch test
 ```
+
+### 分支管理策略
+
+通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
+
+如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+![branch](./img/branch.png)
