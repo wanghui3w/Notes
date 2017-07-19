@@ -81,7 +81,7 @@ D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~0 -0 !]>
 > * 第二步，使用命令git commit，完成。
 
 ***
-# 时光穿梭机
+## 时光穿梭机
 之前田间了git.md文件，运行`git status`
 ```
 D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]> git status
@@ -244,5 +244,34 @@ D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +3 ~1 -0 !]>
 
 > * 场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。
 
+## 删除文件
+
+### 第一种：
+
+1. 操作系统下直接删除`rm test.txt`，如果需要找回`git checkout -- test.txt`
+2. `git rm test.txt`
+3. `git commit -m "delete test"`
+
+### 第二种
+1. `git rm test.txt`
+2. `git commit -m "delete test"`
+
+### 小结
+> `git checkout`其实是用版本库里的版本替换工作区的版本，无论工作区是修改还是删除，都可以“一键还原”。命令`git rm`用于删除一个文件。如果一个文件已经被提交到版本库，那么你永远不用担心误删，但是要小心，你只能恢复文件到最新版本，你会丢失最近一次提交后你修改的内容。
+
+***
+
+## 远程仓库
+
+注册GitHub账号。由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以，需要一点设置：
+
+### 第1步：创建SSH Key
+
+```
+$ ssh-keygen -t rsa -C "wanghui3w@139.com"
+```
+### 第2步：登陆GitHub
+
+打开“Account settings”，“SSH Keys”页面，然后点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容。
 
 ![Alt text](./img/md.jspg "Optional title")
