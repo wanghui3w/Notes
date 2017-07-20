@@ -5,6 +5,7 @@ markdown 语法：
 
 http://www.appinn.com/markdown/
 ***
+
 ## Git安装
 ### Linux下安装
 
@@ -56,6 +57,13 @@ $ ls -ah
 如果你没有看到`.git`目录，那是因为这个目录默认是隐藏的，用`ls -ah`命令就可以看见。
 
 ### 把文件添加到版本库
+<<<<<<< HEAD
+
+
+![Alt text](./img/md.jspg "Optional title")
+
+test
+=======
 第一步，用命令git add告诉Git，把文件添加到仓库：
 
 `D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +1 ~0 -0 !]> git add .\git.md`
@@ -297,5 +305,239 @@ $ git merge
 
 $ git pull
 ```
+### 添加远程仓库
 
-![Alt text](./img/md.jspg "Optional title")
+登陆GitHub，然后，在右上角找到“Create a new repo”按钮，创建一个新的仓库，然后执行命令，将本地库与远程库关联，并执行推送：
+```
+$ git remote add origin git@github.com:michaelliao/learngit.git
+$ git push -u origin master
+```
+
+#### 小结
+
+要关联一个远程库，使用命令`git remote add origin git@server-name:path/repo-name.git`；
+
+关联后，使用命令`git push -u origin master`第一次推送master分支的所有内容；
+
+此后，每次本地提交后，只要有必要，就可以使用命令`git push origin master`推送最新修改；
+
+分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+
+### 从远程库克隆
+
+首先，登陆GitHub，创建一个新的仓库，勾选Initialize this repository with a README，这样GitHub会自动为我们创建一个README.md文件。
+```
+$ git clone git@github.com:michaelliao/gitskills.git
+Cloning into 'gitskills'...
+remote: Counting objects: 3, done.
+remote: Total 3 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (3/3), done.
+
+$ cd gitskills
+$ ls
+README.md
+```
+
+如果有多个人协作开发，那么每个人各自从远程克隆一份就可以了。
+
+你也许还注意到，GitHub给出的地址不止一个，还可以用`https://github.com/michaelliao/gitskills.git`这样的地址。实际上，Git支持多种协议，默认的git://使用ssh，但也可以使用https等其他协议。
+
+使用https除了速度慢以外，还有个最大的麻烦是每次推送都必须输入口令，但是在某些只开放http端口的公司内部就无法使用ssh协议而只能用https。
+
+***
+
+## 分支管理
+
+### 创建与合并分支
+
+首先，我们创建dev分支，然后切换到dev分支：
+
+```
+$ git checkout -b dev
+Switched to a new branch 'dev'
+```
+
+`git checkout`命令加上-b参数表示创建并切换，相当于以下两条命令：
+```
+$ git branch dev
+$ git checkout dev
+Switched to branch 'dev'
+```
+然后，用`git branch`命令查看当前分支：
+```
+$ git branch
+* dev
+  master
+```
+
+然后提交：
+```
+$ git add readme.txt
+$ git commit -m "branch test"
+[dev fec145a] branch test
+ 1 file changed, 1 insertion(+)
+```
+现在，dev分支的工作完成，我们就可以切换回master分支：
+```
+$ git checkout master
+Switched to branch 'master'
+```
+把dev分支的工作成果合并到master分支上：
+```
+$ git merge dev
+Updating d17efd8..fec145a
+Fast-forward
+ readme.txt |    1 +
+ 1 file changed, 1 insertion(+)
+```
+合并完成后，就可以放心地删除dev分支了：
+```
+$ git branch -d dev
+Deleted branch dev (was fec145a).
+```
+
+#### 小结
+
+Git鼓励大量使用分支：
+
+查看分支：`git branch`
+
+创建分支：`git branch <name>`
+
+切换分支：`git checkout <name>`
+
+创建+切换分支：`git checkout -b <name>`
+
+合并某分支到当前分支：`git merge <name>`
+
+删除分支：`git branch -d <name>`
+
+### 解决冲突
+准备新的feature1分支，继续我们的新分支开发，在feature1分支上修改并提交，切换到master分支修改并提交，这种情况下，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突：
+```
+$ git merge feature1
+Auto-merging readme.txt
+CONFLICT (content): Merge conflict in readme.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
+Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容，我们修改如下后保存再提交：
+```
+$ git add readme.txt
+$ git commit -m "conflict fixed"
+[master 59bc1cb] conflict fixed
+```
+用带参数的git log也可以看到分支的合并情况：
+```
+$ git log --graph --pretty=oneline --abbrev-commit
+*   59bc1cb conflict fixed
+|\
+| * 75a857c AND simple
+* | 400b400 & simple
+|/
+* fec145a branch test
+```
+
+### 分支管理策略
+
+通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
+
+如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+在实际开发中，我们应该按照几个基本原则进行分支管理：
+
+首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+
+那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；
+
+你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了。
+
+所以，团队合作的分支看起来就像这样：
+![branch](./img/branch.png)
+
+### Bug分支
+
+当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支issue-101来修复它，但是，等等，当前正在dev上进行的工作还没有提交,并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？
+
+幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+```
+$ git stash
+Saved working directory and index state WIP on dev: 6224937 add merge
+HEAD is now at 6224937 add merge
+```
+
+#### 小结
+
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+当手头工作没有完成时，先把工作现场`git stash`一下，然后去修复bug，修复后，再`git stash pop`，回到工作现场。
+
+### Feature分支
+#### 小结
+
+开发一个新feature，最好新建一个分支；
+
+如果要丢弃一个没有被合并过的分支，可以通过`git branch -D <name>`强行删除。
+
+### 多人协作
+当你从远程仓库克隆时，实际上Git自动把本地的master分支和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。
+
+要查看远程库的信息，用git remote：
+```
+$ git remote
+origin
+```
+或者，用git remote -v显示更详细的信息：
+```
+$ git remote -v
+origin  git@github.com:michaelliao/learngit.git (fetch)
+origin  git@github.com:michaelliao/learngit.git (push)
+```
+上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。
+
+#### 推送分支
+
+推送分支，就是把该分支上的所有本地提交推送到远程库。推送时，要指定本地分支，这样，Git就会把该分支推送到远程库对应的远程分支上：
+
+`$ git push origin master`
+
+如果要推送其他分支，比如dev，就改成：
+
+`$ git push origin dev`
+但是，并不是一定要把本地分支往远程推送，那么，哪些分支需要推送，哪些不需要呢？
+
+`master`分支是主分支，因此要时刻与远程同步；
+
+`dev`分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
+
+`bug`分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
+
+`feature`分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+
+总之，就是在Git中，分支完全可以在本地自己藏着玩，是否推送，视你的心情而定！
+
+因此，多人协作的工作模式通常是这样：
+
+首先，可以试图用`git push origin branch-name`推送自己的修改；
+
+如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+
+如果合并有冲突，则解决冲突，并在本地提交；
+
+没有冲突或者解决掉冲突后，再用`git push origin branch-name`推送就能成功！
+
+如果`git pull`提示“no tracking information”，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream branch-name origin/branch-name`。
+
+这就是多人协作的工作模式，一旦熟悉了，就非常简单。
+
+#### 小结
+
+查看远程库信息，使用`git remote -v`；
+
+本地新建的分支如果不推送到远程，对其他人就是不可见的；
+
+从本地推送分支，使用`git push origin branch-name`，如果推送失败，先用`git pull`抓取远程的新提交；
+
+在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`，本地和远程分支的名称最好一致；
+
+建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
+
+从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
