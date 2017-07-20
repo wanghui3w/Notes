@@ -56,14 +56,6 @@ $ ls -ah
 
 如果你没有看到`.git`目录，那是因为这个目录默认是隐藏的，用`ls -ah`命令就可以看见。
 
-### 把文件添加到版本库
-<<<<<<< HEAD
-
-
-![Alt text](./img/md.jspg "Optional title")
-
-test
-=======
 第一步，用命令git add告诉Git，把文件添加到仓库：
 
 `D:\MyDoc\GitHub\Notes\08-版本管理\Git [master +1 ~0 -0 !]> git add .\git.md`
@@ -493,6 +485,22 @@ origin  git@github.com:michaelliao/learngit.git (push)
 ```
 上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。
 
+#### 获取修改后内容
+```
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master]> git pull
+Warning: Permanently added 'github.com,192.30.255.112' (RSA) to the list of known hosts.
+There is no tracking information for the current branch.
+Please specify which branch you want to merge with.
+See git-pull(1) for details.
+
+    git pull <remote> <branch>
+
+If you wish to set tracking information for this branch you can do so with:
+
+    git branch --set-upstream-to=origin/<branch> master
+
+D:\MyDoc\GitHub\Notes\08-版本管理\Git [master]> git branch --set-upstream-to=origin/master master
+```
 #### 推送分支
 
 推送分支，就是把该分支上的所有本地提交推送到远程库。推送时，要指定本地分支，这样，Git就会把该分支推送到远程库对应的远程分支上：
