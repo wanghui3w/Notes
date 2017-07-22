@@ -1,7 +1,11 @@
 
 # Nginx配置SSL证书部署HTTPS网站
 
-`set OPENSSL_CONF=openssl.cnf`
+>调试环境：
+系统：win10
+Apache： Apache/2.4.26 (Win64)
+nginx:nginx/1.12.1
+
 
 ### 1.生成一个RSA密钥(密码abcd)
 `$ openssl genrsa -des3 -out abcd.key 1024`
@@ -29,6 +33,7 @@ D:\app\Apache24\conf>
 ```
 
 ### 3.生成一个证书请求
+提示找不到`openssl.cnf`时，需配置环境变量`set OPENSSL_CONF=openssl.cnf`。
 `$ openssl req -new -key abcd.key -out abcd.csr`
 ```
 D:\app\Apache24\conf>set OPENSSL_CONF=openssl.cnf
