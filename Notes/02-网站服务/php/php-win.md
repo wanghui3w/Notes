@@ -39,7 +39,7 @@ php-cgi.exe -b 127.0.0.1:9000 -c D:\app\php-5.6.31-nts-Win32-VC11-x64\php.ini
 ```
 ### 集成nginx环境
 
-[参考nginx](../nginx/nginx.md)
+[参考nginx](../nginx/nginx.md#集成php环境)
 
 ### php.ini配置文件参考如下：
 ```
@@ -222,17 +222,5 @@ ldap.max_links = -1
 [opcache]
 [curl]
 [openssl]
-
-```
-```
-
-```
-```
-
-```
-```
-
-```
-```
 
 ```

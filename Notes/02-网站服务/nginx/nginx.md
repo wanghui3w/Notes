@@ -78,3 +78,17 @@ server{
 
 
 ### 重启nginx后的检测
+
+## 集成php环境
+[配置php环境](../php/php-win.md)，修改nginx.conf,支持php
+```
+# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+
+location ~ \.php$ {
+    root           html;
+    fastcgi_pass   127.0.0.1:9000;
+    fastcgi_index  index.php;
+    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    include        fastcgi_params;
+}
+```
