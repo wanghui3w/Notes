@@ -1,10 +1,13 @@
 
 # Nginx配置SSL证书部署HTTPS网站
 
->调试环境：
-系统：win10
-Apache： Apache/2.4.26 (Win64)
-nginx:nginx/1.12.1
+调试环境：
+
+* 系统：win10
+
+* Apache： Apache/2.4.26 (Win64)
+
+* nginx:nginx/1.12.1
 
 
 ### 1.生成一个RSA密钥(密码abcd)
