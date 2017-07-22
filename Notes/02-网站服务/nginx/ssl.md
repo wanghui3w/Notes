@@ -100,4 +100,4 @@ server {
     }
 }
 ```
-`ssl_certificate_key  keys/abcd_nopass.key;`配置为`abcd.key`时，每次启动nginx时需要输入密码，可能windows的问题，无法启动；配置为`abcd_nopass.key`即可正常启动。
+`ssl_certificate_key  keys/abcd_nopass.key;`配置为`abcd.key`时，每次启动nginx时需要输入密码，可能windows的问题，无法启动；配置为`abcd_nopass.key`即可正常启动;在win10环境下使用openssl制作ca的证书文件时出现问题：Unable to write ‘random state’，需要在“管理员”模式下运行。
