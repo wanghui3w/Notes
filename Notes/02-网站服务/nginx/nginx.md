@@ -88,7 +88,16 @@ location ~ \.php$ {
     root           html;
     fastcgi_pass   127.0.0.1:9000;
     fastcgi_index  index.php;
-    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    fastcgi_param  SCRIPT_FILENAME  D:/app/nginx-1.12.1/html$fastcgi_script_name;
     include        fastcgi_params;
 }
 ```
+`nginx.conf`中`fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name`修改为`fastcgi_param  SCRIPT_FILENAME  D:\app\nginx-1.12.1\html$fastcgi_script_name;`不能访问，提示‘No input file specified’，nginx access.log中出现404，将`\`替换为`/  `正常，`fastcgi_param  SCRIPT_FILENAME  D:/app/nginx-1.12.1/html$fastcgi_script_name`。
+
+编辑index.php文件
+```
+<?php phpinfo(); ?>
+```
+执行命令`nginx -s reload`
+
+访问http://localhost/phpinfo.php查看是否可以打开phpinfo页面

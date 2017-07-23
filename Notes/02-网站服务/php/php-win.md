@@ -33,13 +33,15 @@ cgi.force_redirect = 0
 fastcgi.impersonate = 1
 cgi.rfc2616_headers = 1
 ```
+需要配置`doc_root = D:\app\nginx-1.12.1\html\`，否则报错`No input file specified.`,经过尝试`doc_root=`,配置nginx.conf，设置`fastcgi_param  SCRIPT_FILENAME  D:/app/nginx-1.12.1/html$fastcgi_script_name`，之前错误由于`\`引起，替换为`/`正常。
+
 ### 启动
 ```
 php-cgi.exe -b 127.0.0.1:9000 -c D:\app\php-5.6.31-nts-Win32-VC11-x64\php.ini
 ```
 ### 集成nginx环境
 
-[参考nginx](../nginx/nginx.md#集成php环境)
+[参考《nginx》中“集成php环境”](../nginx/nginx.md#集成php环境)
 
 ### php.ini配置文件参考如下：
 ```
