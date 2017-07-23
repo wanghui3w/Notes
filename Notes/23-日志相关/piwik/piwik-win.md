@@ -97,10 +97,18 @@ unix平台：
 ### 更新geoip地址库
 #### 下载geoip地址库
 http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+
 解压缩，重命名为`GeoIPCity.dat`，拷贝至`D:\app\piwik\misc`。
+
 #### 下载windows版本gphp_eoip.dll
 http://windows.php.net/downloads/pecl/releases/geoip/1.1.1/
+
 解压缩后，拷贝`php_geoip.pdb`、`php_geoip.dll`至`D:\app\php-5.6.31-nts-Win32-VC11-x64\ext`。
+
+>PECL扩展
+>
+>`http://windows.php.net/downloads/pecl/releases/`
+
 #### 配置php.ini
 ```
 extension=php_geoip.dll
