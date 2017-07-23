@@ -19,6 +19,7 @@ https://piwik.org/
 配置hosts文件`127.0.0.1  piwik.abcd.com`
 
 ### 修改nginx.conf文件
+应用访问配置：
 ```
 #HTTPS server
 
@@ -41,6 +42,32 @@ server {
     }
     location ~ \.php$ {
         root           html;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  D:/app/piwik$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}
+```
+
+为了防止外部用户访问应用，专门发布一个对外站点收集客户端信息，仅允许访问`piwik.js`、`piwik.php`,配置如下：
+```
+#HTTP server
+
+server {
+listen       7003;
+    server_name  piwik.abcd.com;
+
+    location  / {
+        root   html/piwik;
+        index  index.html index.htm index.php;
+    }
+location  ~/piwik.js {
+        root   D:/app/piwik;
+        index  index.html index.htm index.php;
+    }
+location ~piwik\.php {
+        #root           html/piwik;
         fastcgi_pass   127.0.0.1:9000;
         fastcgi_index  index.php;
         fastcgi_param  SCRIPT_FILENAME  D:/app/piwik$fastcgi_script_name;
@@ -71,6 +98,8 @@ unix平台：
 打开/etc/php.ini
 把 ;extension=php_mbstring.so 改成 extension=php_mbstring.so 。
 ```
+配置`GD > 2.x + Freetype (graphics)`，修改php.ini
+`extension=php_gd2.dll`
 3. 配置数据库
 ![数据库配置](./piwik-win/piwik-03.png)
 4. 设置超级用户
