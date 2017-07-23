@@ -98,8 +98,8 @@ unix平台：
 打开/etc/php.ini
 把 ;extension=php_mbstring.so 改成 extension=php_mbstring.so 。
 ```
-配置`GD > 2.x + Freetype (graphics)`，修改php.ini
-`extension=php_gd2.dll`
+配置`GD > 2.x + Freetype (graphics)`，修改php.ini`extension=php_gd2.dll`
+
 3. 配置数据库
 ![数据库配置](./piwik-win/piwik-03.png)
 4. 设置超级用户
