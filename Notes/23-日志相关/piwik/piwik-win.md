@@ -6,9 +6,12 @@ http://nginx.org/
 
 https://piwik.org/
 
+## 环境准备
 [搭建nginx+php环境](../../02-网站服务/nginx/nginx.md)
 
 [搭建mysql环境](../../03-数据库/mysql/mysql-win.md)
+
+## 部署
 ### 解压至piwik至发布目录
 `D:\app\piwik`
 
@@ -70,8 +73,10 @@ unix平台：
 ```
 3. 配置数据库
 ![数据库配置](./piwik-win/piwik-03.png)
-4. 设定站点
-5. 生成跟踪代码
+4. 设置超级用户
+![设置超级用户](./piwik-win/piwik-04.png)
+5. 设定站点
+6. 生成跟踪代码
 ```
 <!-- Piwik -->
 <script type="text/javascript">
@@ -89,3 +94,20 @@ unix平台：
 </script>
 <!-- End Piwik Code -->
 ```
+### 更新geoip地址库
+#### 下载geoip地址库
+http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+解压缩，重命名为`GeoIPCity.dat`，拷贝至`D:\app\piwik\misc`。
+#### 下载windows版本gphp_eoip.dll
+http://windows.php.net/downloads/pecl/releases/geoip/1.1.1/
+解压缩后，拷贝`php_geoip.pdb`、`php_geoip.dll`至`D:\app\php-5.6.31-nts-Win32-VC11-x64\ext`。
+#### 配置php.ini
+```
+extension=php_geoip.dll
+[geoip]
+geoip.custom_directory = D:\\app\\piwik\\misc
+```
+重启php
+`D:\app>D:\app\php-5.6.31-nts-Win32-VC11-x64\php-cgi.exe -b 127.0.0.1:9000 -c D:\app\php-5.6.31-nts-Win32-VC11-x64\php.ini`
+#### 选择Geoip库
+![选择Geoip库](./piwik-win/piwik-05.png)
