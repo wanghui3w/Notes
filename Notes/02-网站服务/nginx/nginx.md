@@ -188,8 +188,87 @@ kill -USR1 `cat /usr/local/nginx/logs/nginx.pid`
 或者使用`nginx -s reload` 替换kill -USR1 \`cat /usr/local/nginx/logs/nginx.pid\`
 
 2. 添加计划任务（每分钟执行一次）
-`crontab -e`添加计划任务
 
-*/1 * * * * sh /data/runlog.sh >/dev/null 2>&1
+    `crontab -e`添加计划任务
 
-`crontab -l` 查看计划任务
+    `*/1 * * * * sh /data/runlog.sh >/dev/null 2>&1`
+
+    `crontab -l` 查看计划任务
+
+## location
+### location语法
+```
+location[=|~|~*|^~|@] uri{
+	...
+}
+```
+```
+=：精确匹配
+~:大小写敏感匹配
+~*:不区分大小写
+!：取反
+^~:不做正则检查，常规检查
+@：
+```
+### location 测试
+
+```
+server {
+    listen       1006;
+    server_name 192.168.0.121;
+
+    location = / {
+        return 401;
+    }
+
+    location / {
+        return 402;
+    }
+
+    location /documents/ {
+        return 403;
+    }
+
+    location ^~ /images/ {
+        return 404;
+    }
+
+    location ~* \.(gif|jpg) {
+        return 500;
+    }
+
+}
+```
+`curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1006/`
+```
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080
+401
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/
+401
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/abc
+402
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/documents
+402
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/documents/
+403
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/documents/abc
+403
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/images/
+404
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/IMAGES/
+402
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/images/abc.jpg
+404
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/images/ABC.JPG
+404
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/abc.jpg
+500
+[root@ops-83 conf.d]# curl -s -o /dev/null -I -w "%{http_code}\n" http://192.168.0.121:1080/abc.JPG
+500
+[root@ops-83 conf.d]#
+```
+```
+/:默认匹配
+=:优先，和顺序无关
+^~ 和 ~*：有限匹配^~
+```
