@@ -43,6 +43,21 @@ php-cgi.exe -b 127.0.0.1:9000 -c D:\app\php-5.6.31-nts-Win32-VC11-x64\php.ini
 
 [参考《nginx》中“集成php环境”](../nginx/nginx.md#集成php环境)
 
+### 常见问题 nginx - php-cgi.exe进程自动退出
+
+RunHiddenConsole E:/wnmp/php5/php-cgi.exe -b 127.0.0.1:9000 -c "E:/wnmp/php5/php.ini"
+第一步：下载xxfpm,百度搜一下，有很多。
+
+第二步：新建一个文本，写上以下代码。
+
+```
+RunHiddenConsole.exe H:/Server_Core/xxfpm/bin/xxfpm.exe "H:/Server_Core/PHP/php-cgi.exe -c
+H:/Server_Core/PHP/php.ini" -n 2 -i 127.0.0.1 -p 9000
+```
+
+解释下：
+RunHiddenConsole.exe这个是窗口隐藏工具，因为如果不用这个，CMD窗口就会一直开着，关闭窗口的话进程也就会退出了,把这个RunHiddenConsole.exe和php-cgi.bat要放在你的PHP根目录下。
+
 ### php.ini配置文件参考如下：
 ```
 [PHP]
