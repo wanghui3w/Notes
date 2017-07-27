@@ -272,3 +272,18 @@ server {
 =:优先，和顺序无关
 ^~ 和 ~*：有限匹配^~
 ```
+
+## rewrite
+### rewrite语法
+### rewrite示例
+```
+server {
+    listen       1006;
+    server_name www.abcd.com abcd.com;
+
+    location = / {
+        rewrite ^/(.*) http://www.xx.com/$1 permanent;
+    }
+}
+```
+`$1`后向引用,`permanent`永久跳转，类似301。
