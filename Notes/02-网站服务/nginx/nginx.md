@@ -110,6 +110,25 @@ server{
 
 ### 重启nginx后的检测
 
+### Nginx 监控
+```
+location /nginx_status{
+	stub_status on;
+	access_log off;
+	allow 10.0.0.0/24;
+	deny allow;
+}
+```
+```
+server:启动nginx到现在共处理的连接数
+accepts:启动nginx到现在创建的握手数
+请求丢失数=握手数-连接数
+handled requests:表述共处理请求数
+reading：读取到客户端的header信息数
+writing:返回给客户端的header信息数
+waiting：nginx已经处理完正在等候下一次请求指令的驻留连接。开启keepalive的情况下，这个值等于active-（reading+writing）
+```
+**为了安全，这个状态要防止被外部用户看到**
 ## 集成php环境
 [配置php环境](../php/php-win.md)，修改nginx.conf,支持php
 ```
@@ -287,3 +306,40 @@ server {
 }
 ```
 `$1`后向引用,`permanent`永久跳转，类似301。
+
+## nginx访问认证
+### 配置文件修改
+```
+location /{
+	auth_basic	"xxxx";
+	auth_basic_user_file conf/htpasswd;
+}
+```
+使用位置：http/server/location/limit_except
+
+### 生成密码文件
+可以使用apache自带的“htpasswd ”或“openssl passwd”设置。
+
+```
+# htpasswd -bc /etc/nginx/conf/htpasswd wanghui 1234567
+# chmod /etc/nginx/conf/htpasswd
+# chown nginx /etc/nginx/conf/htpasswd
+```
+重新加载生效
+```
+# nginx -t
+# nginx -s reload
+```
+## nginx 的目录浏览
+### autoindex
+```
+server{
+  listen  10.0.0.11:80;
+  server_name bbs.bacd.com b.abcd.com abcd.com;
+  location /{
+    root html/bbs;
+		autoindex on;
+    index index.html index.htm;
+  }
+}
+```
