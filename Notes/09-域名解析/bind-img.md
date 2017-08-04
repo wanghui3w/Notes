@@ -400,6 +400,7 @@ mx   MX   5 192.168.0.101
 ```
 >MX优先级设置为5
 ### PTR记录
+>ptr记录有问题，暂时没有调通
 1. 编辑master节点view.conf文件，加入ptr的zone配置
     ```
     zone "168.192.in-addr.arpa" {
@@ -415,3 +416,43 @@ mx   MX   5 192.168.0.101
     };
     ```
 2. 编辑master节点168.192.zone文件
+
+---
+## 清除DNS缓存
+### Windows
+```
+ipconfig /flushdns
+```
+
+### Linux
+
+
+### chrome
+* 查看缓存:`chrome://dns/`
+* 清除Chrome浏览器的DNS缓存
+
+  在地址栏中输入: `chrome://net-internals/#dns`，然后点"Clear host cache"按钮。
+* 清除套接字缓存:
+
+  在地址栏中输入: `chrome://net-internals/#sockets`，然后点"Clear idle sockets"按钮和"Flush socket pools"按钮。
+
+* 清除浏览缓存
+
+  有时候还需要清除浏览缓存。在地址栏中输入: `chrome://settings/clearBrowserData`，选择"浏览记录"和"缓存的图片和文件"两项内容，点"清除浏览缓存"按钮。
+
+
+  ---
+## 通过nginx反向代理对dns进行负载均衡
+```
+  stream {
+    upstream dns_servers {
+        least_conn;
+        server 192.168.0.119:53;
+        server 192.168.0.121:53;
+    }
+    server {
+        listen     53 udp;
+        proxy_pass dns_servers;
+    }
+  }
+```

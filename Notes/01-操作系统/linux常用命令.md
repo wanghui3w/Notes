@@ -25,6 +25,9 @@ diff file1 file2
 # g
 ```
 grep -v "#|^$" nginx.conf #排除注释‘#’和空行；
+     -r 递归
+     -n 显示行号
+grep -rn wanghui ./
 ```
 # h
 ```
@@ -45,11 +48,17 @@ ip addr add 10.0.0.10/24 dev eth0
 ```
 # l
 ```
-lsof  list open files
+# list open files
+lsof  
 ```
 # m
 ```
-
+# md5校验
+md5sum * > tmp.md5
+md5sum -c tmp.md5
+# md5批量校验
+find ./ -type f -print0 | xargs -0 md5sum > ./backup.md5
+md5sum -c ./backup.md5 |grep -nv OK
 ```
 # n
 ```
