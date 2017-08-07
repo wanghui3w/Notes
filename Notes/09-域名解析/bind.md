@@ -7,6 +7,16 @@
 3. 若没有查到，则请求根DNS服务器，并依次从根、定级、二级查找，直至找到，即向客户机发出响应信息
 4. 若没有找到，返回错误信息
 
+### 一些概念
+FQDN (Full Qualified Domain Name) –> IP : 正向解析\
+IP –> FQDN：反向解析 \
+递归：DNS请求被服务器接收后，如果属于此服务器管辖范围则请求上级服务器依次传递请求，并且依次传递结果给发出请求的主机。客户机指向的服务器一定给递归服务。  \
+迭代： DNS请求被服务器接收后，如果不是自己管辖范围，让客户端访问根域服务器，然后跟域通知客户端去访问下级服务器，直到最后客户端访问管辖请求域名的服务器为止。\
+
+域（Domain）：逻辑概念\
+区域（zone）：物理概念，特指存储资源记录的硬件设备，如文本文件，或者数据库\
+正向区域和反向区域域不能存储在一个文件或者数据库中，由于解析技术不同 \
+
 ### DNS的分类
 * 主DNS
 * 从DNS
@@ -264,7 +274,7 @@ Address: 192.168.2.31
     $TTL server端缓存时间，秒
     Serial 序列号，每次修改完dns需增加，以使dns能够判断出修改了，以进行同步，实际配置时可以配置为时间戳；
     Refresh：同步刷新间隔；
-    Reetry：失败后隔多长时间重试；
+    Retry：失败后隔多长时间重试；
     Expire：超过该时间后认为dns服务不可用
     NS:ns地址，域名服务商处配置，如万网，让其他人知道该域名由谁进行解析
     A记录解析，首先要配置自己ns记录的解析，否则别人无法找到dns服务器
@@ -283,4 +293,166 @@ Address: 192.168.2.31
     ```
     /var/named/chroot/etc/abcd.tax.zone
     ```
-    
+10. 修改权限及重启
+修改目录权限：`cd /var && chown -R named.named named/`
+重启：`systemctl restart named`
+>启动失败，不能写入pid文件，重新进行了授权，后来又报出pid文件不可读,经查是个bug
+https://unix.stackexchange.com/questions/116725/pid-file-var-run-named-named-pid-not-readable-yet-after-start
+![](./bind-img/bind-01.png)
+
+***
+## bind 配置slave
+### 安装及编辑相同文件（同master一样）
+1. 安装yum install bind-utils bind bind-devel bind-chroot
+2. 编辑/etc/named.conf
+3. 编辑/etc/rndc.key
+4. 编辑/etc/nrdc.conf
+
+### 编辑单独文件
+编辑/var/named/chroot/etc/view.conf
+
+```
+[root@ops-83 etc]# vim view.conf
+view "SlaveView" {
+  zone "tax861.gov.test" {
+        type    slave;
+        masters {192.168.0.119;};
+        file    "slave.abcd.gov.cn.zone";
+  };
+  zone "tax862.gov.cn" {
+        type    slave;
+        masters {192.168.0.119;};
+        file    "slave.abcd2.gov.cn.zone";
+  };
+  zone "abcd.tax" {
+        type    slave;
+        masters {192.168.0.119;};
+        file    "slave.abcd.tax.zone";
+  };
+};
+```
+
+### 同步
+1. 修改master上view.conf配置，将slave节点IP加入
+2. 修改master上zone文件中serial+1
+3. 修改slave目录权限`cd /var && chown -R named.named named/`
+4. 启动slave bind服务`systemctl start named`
+5. 重载master bind服务`rndc reload`
+
+>日常同步修改完master上zone文件后，修改serial值+1，执行重载命令`rndc reload`
+
+***
+## DNS添加
+针对dns操作后，需要执行`rndc reload`
+
+### A记录
+```
+ns1     A       192.168.0.119
+ns2     A       192.168.0.121
+2w              A       192.168.0.121
+3w              A       192.168.0.119
+admin   A       192.168.2.31
+```
+```
+[root@ops-82 etc]# host admin.abcd.tax
+admin.abcd.tax has address 192.168.2.31
+[root@ops-82 etc]# host admin.abcd.tax 192.168.0.119
+Using domain server:
+Name: 192.168.0.119
+Address: 192.168.0.119#53
+Aliases:
+
+admin.abcd.tax has address 192.168.2.31
+[root@ops-82 etc]# host admin.abcd.tax 192.168.0.121
+Using domain server:
+Name: 192.168.0.121
+Address: 192.168.0.121#53
+Aliases:
+
+admin.abcd.tax has address 192.168.2.31
+```
+### CNAME
+```
+cname   CNAME   admin.abcd.tax.
+```
+```
+[root@ops-82 etc]# host cname.abcd.tax 192.168.0.119
+Using domain server:
+Name: 192.168.0.119
+Address: 192.168.0.119#53
+Aliases:
+
+cname.abcd.tax is an alias for admin.abcd.tax.
+admin.abcd.tax has address 192.168.2.31
+[root@ops-82 etc]# host cname.abcd.tax 192.168.0.121
+Using domain server:
+Name: 192.168.0.121
+Address: 192.168.0.121#53
+Aliases:
+
+Host cname.abcd.tax not found: 3(NXDOMAIN)
+[root@ops-82 etc]#
+```
+>121没有做DNS数据同步，造成cname无法解析
+### MX记录
+```
+mx   MX   5 192.168.0.101
+```
+>MX优先级设置为5
+### PTR记录
+>ptr记录有问题，暂时没有调通
+1. 编辑master节点view.conf文件，加入ptr的zone配置
+    ```
+    zone "168.192.in-addr.arpa" {
+          type    master;
+          file    "168.192.zone";
+          allow-transfer {
+                  192.168.0.121;
+          };
+          notify  yes;
+          also-notify {
+                  192.168.0.121;
+          };
+    };
+    ```
+2. 编辑master节点168.192.zone文件
+
+---
+## 清除DNS缓存
+### Windows
+```
+ipconfig /flushdns
+```
+
+### Linux
+
+
+### chrome
+* 查看缓存:`chrome://dns/`
+* 清除Chrome浏览器的DNS缓存
+
+  在地址栏中输入: `chrome://net-internals/#dns`，然后点"Clear host cache"按钮。
+* 清除套接字缓存:
+
+  在地址栏中输入: `chrome://net-internals/#sockets`，然后点"Clear idle sockets"按钮和"Flush socket pools"按钮。
+
+* 清除浏览缓存
+
+  有时候还需要清除浏览缓存。在地址栏中输入: `chrome://settings/clearBrowserData`，选择"浏览记录"和"缓存的图片和文件"两项内容，点"清除浏览缓存"按钮。
+
+
+  ---
+## 通过nginx反向代理对dns进行负载均衡
+```
+  stream {
+    upstream dns_servers {
+        least_conn;
+        server 192.168.0.119:53;
+        server 192.168.0.121:53;
+    }
+    server {
+        listen     53 udp;
+        proxy_pass dns_servers;
+    }
+  }
+```

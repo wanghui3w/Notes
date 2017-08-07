@@ -307,6 +307,22 @@ server {
 ```
 `$1`后向引用,`permanent`永久跳转，类似301。
 
+url重写
+```
+location /cathtml{
+		root /ecmoban/www;
+		index index.php index.html index.html;
+		#rewrite "cathtml-(\d{1,7}).html" "/category.php?id=(\d{1,7})";
+		rewrite "cathtml-(\d+).html" /category.php?id=$1;
+}
+location /goods{
+		root /ecmoban/www;
+		index index.php index.html index.html;
+		rewrite "goods-(\d+).html" /goods.php?id=$1;
+}
+```
+`(\d+)`，为任意个数字，`$1`为后向引用，前面匹配的可以在后面直接调用
+
 ## nginx访问认证
 ### 配置文件修改
 ```
@@ -343,3 +359,109 @@ server{
   }
 }
 ```
+
+## 提升网站性能
+### 启用nginx 压缩
+
+查看nginx中文件类型准确写法mime.types，可以放置在http、server、location段的位置
+```
+		gzip on;
+    gzip_buffers 32 4k;
+    gzip_comp_level 6;
+    gzip_min_length 20;
+    gzip_types text/css text/xml application/x-javascript;
+```
+对比测试结果:\
+`curl 'http://192.168.0.121:99/themes/ecmoban_dsc2017/css/base.css' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip, deflate, sdch' >/dev/null`
+
+![](./nginx-img/nginx-01.png)
+
+### expires缓存
+通过正则表达式对.jpg/.js/.png/.gif进行缓存，没有缓存的css就没有过期时间。同时需要注意正则表达式写法，如果gif后有“|”，则要匹配一个空字符串，相当于所有的都能匹配上了。
+```
+location ~ \.(jpg|js|png|gif){
+        expires 1d;
+        root /ecmoban/www;
+    }
+```
+
+### 负载均衡
+
+```
+[root@ops-83 conf.d]# grep -v '#' back-101.conf
+server {
+    listen       1001;
+    server_name  _;
+    access_log  /var/log/nginx/101.access.log  main;
+    location / {
+        root   /usr/share/nginx/back_html_101;
+        index  index.php index.html index.htm;
+    }
+    error_page  404              /404.html;
+    location = /404.html {
+        root /usr/share/nginx/back_html_101;
+    }
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/back_html_101;  
+    }
+    location ~ \.php$ {
+        root           /ecmoban/www;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}
+```
+```
+[root@ops-83 conf.d]# grep -v '#' back-102.conf
+server {
+    listen       1002;
+    server_name  _;
+    access_log  /var/log/nginx/102.access.log  main;
+    location / {
+        root   /usr/share/nginx/back_html_102;
+        index  index.php index.html index.htm;
+    }
+    error_page  404              /404.html;
+    location = /404.html {
+        root /usr/share/nginx/back_html_101;
+    }
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/back_html_101;  
+    }
+    location ~ \.php$ {
+        root           /ecmoban/www;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}
+```
+```
+[root@ops-83 conf.d]# grep -v '#' back.conf
+upstream  up_test{
+    server 192.168.0.121:1001;
+    server 192.168.0.121:1002;
+}
+
+server {
+    listen       1005;
+    server_name  _;
+    gzip on;
+    gzip_buffers 32 4k;
+    gzip_comp_level 6;
+    gzip_min_length 20;
+    gzip_types text/css text/xml application/x-javascript;
+    access_log  /var/log/nginx/back.access.log  main;
+    location / {
+        proxy_pass http://up_test;
+    }
+}
+```
+在经过负载均衡后，客户端源ip将丢失，为了准确获得源ip，需要增加参数`proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`。本次测试由1006端口（代理）->1005（代理）->(1001、1002)，最终实现1005日志中记录了源ip（客户端），1001、1002中记录了源ip（客户端）及二级代理ip（1005）。
+![](./nginx-img/nginx-02.png) \
+![](./nginx-img/nginx-03.png) 

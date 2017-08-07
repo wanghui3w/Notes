@@ -27,7 +27,11 @@ diff file1 file2
 grep -v "#|^$" nginx.conf #排除注释‘#’和空行；
      -r 递归
      -n 显示行号
-grep -rn wanghui ./
+     -i 忽略大小写
+     -l 输出文件名清单
+     '^xxx' 以xxx开头
+     'xxx$' 以xxx结束
+grep -rn wanghui ./ #递归查找当前目录下所有含wanghui的文件
 ```
 # h
 ```
